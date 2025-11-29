@@ -303,7 +303,8 @@ export const ROUTINE_ITEMS: RoutineItem[] = [
     mainTime: 'evening',
     order: 13,
     badges: [
-      { label: '2x per week', type: 'time' },
+      // Recommend limiting retinol to 2–3 nights per week
+      { label: '2–3× per week', type: 'time' },
       { label: 'Active', type: 'cat' },
     ],
     link: {
@@ -311,11 +312,11 @@ export const ROUTINE_ITEMS: RoutineItem[] = [
       label: 'Link',
     },
     details: [
-      // Recommend using retinol just a few times per week to avoid irritation
-      'Example nights: Monday & Friday (2–3 times per week).',
+      // Retinol should not be used every night. Aim for 2–3 nights per week to minimise irritation.
+      'Use retinol only 2–3 times per week (example nights: Monday & Thursday or Monday, Wednesday & Friday).',
       'Order: Cleanser → Hyaluronic Acid → (optional thin layer of moisturizer for sensitive skin) → thin layer of retinol → CeraVe → Vaseline under eyes.',
       'Retinol is normally applied after serums and before moisturizer; for very dry or sensitive skin, you can apply a light layer of CeraVe before and after retinol (the “sandwich” method).',
-      'Skip vitamin C on retinol nights and reserve vitamin C for the morning or non‑retinol nights.',
+      'Never layer vitamin C with retinol. Use vitamin C in the morning or on evenings when you are not using retinol.',
     ],
   },
   {
