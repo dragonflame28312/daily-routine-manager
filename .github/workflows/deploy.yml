@@ -25,5 +25,3 @@ jobs:
         with:
           path: dist
       - uses: actions/deploy-pages@v2
-        with:
-          # The deployment will use the uploaded artifact
