@@ -270,7 +270,7 @@ export const ROUTINE_ITEMS: RoutineItem[] = [
     },
     details: [
       'Apply 3–4 drops to slightly damp face after cleansing.',
-      'Tap in gently; follow with niacinamide in the morning or Vitamin C / retinol at night.',
+      'Tap in gently; follow with niacinamide or vitamin C in the morning. At night, follow with retinol (do not apply vitamin C when using retinol).',
     ],
   },
   {
@@ -311,7 +311,8 @@ export const ROUTINE_ITEMS: RoutineItem[] = [
       label: 'Link',
     },
     details: [
-      'Example nights: Monday & Friday.',
+      // Recommend using retinol just a few times per week to avoid irritation
+      'Example nights: Monday & Friday (2–3 times per week).',
       'Order: Cleanser → Hyaluronic Acid → (optional thin layer of moisturizer for sensitive skin) → thin layer of retinol → CeraVe → Vaseline under eyes.',
       'Retinol is normally applied after serums and before moisturizer; for very dry or sensitive skin, you can apply a light layer of CeraVe before and after retinol (the “sandwich” method).',
       'Skip vitamin C on retinol nights and reserve vitamin C for the morning or non‑retinol nights.',
@@ -340,14 +341,16 @@ export const ROUTINE_ITEMS: RoutineItem[] = [
   },
   {
     id: '15',
-    name: 'Vitamin C Nights',
+    name: 'Vitamin C Serum',
     tagline: 'Brightening / dark circles',
-    times: ['evening'],
+    // Vitamin C should primarily be used in the morning; optionally on non‑retinol nights but not with retinol.
+    times: ['morning'],
     categories: ['face'],
-    mainTime: 'evening',
-    order: 15,
+    mainTime: 'morning',
+    // Place after niacinamide but before retinol/ceramide when sorting
+    order: 12.5,
     badges: [
-      { label: 'Non-retinol nights', type: 'time' },
+      { label: 'Morning', type: 'time' },
       { label: 'Serum', type: 'cat' },
     ],
     link: {
@@ -355,9 +358,9 @@ export const ROUTINE_ITEMS: RoutineItem[] = [
       label: 'Link',
     },
     details: [
-      'Use on nights when you are not using retinol.',
-      'Order: Cleanser → HA → Vitamin C serum → CeraVe → Vaseline under eyes.',
-      'Focus on laugh lines and under-eye area (not into the eye).',
+      'Apply after hyaluronic acid has absorbed in the morning.',
+      'If desired, you may use this serum at night on evenings when you are not using retinol. Never layer vitamin C with retinol.',
+      'After applying, follow with CeraVe and then Vaseline under eyes if using at night.',
     ],
   },
   {
