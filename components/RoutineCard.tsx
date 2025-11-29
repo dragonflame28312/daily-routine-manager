@@ -42,11 +42,13 @@ export const RoutineCard: React.FC<RoutineCardProps> = ({ item, isActive }) => {
       }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
       className={`
-        relative w-[320px] md:w-[380px] flex-shrink-0
-      bg-slate-900/60 backdrop-blur-xl border
-      ${isActive ? 'border-sky-500/50 shadow-2xl shadow-sky-500/20' : 'bg-slate-700/50 shadow-xl'}
-      rounded-2xl overflow-hidden
-      transition-colors duration-300 group
+        /* Increase default card width for better mobile readability */
+        relative w-[320px] md:w-[380px] flex-shrink-0 
+        bg-slate-900/60 backdrop-blur-xl border 
+        ${isActive ? 'border-sky-500/50 shadow-2xl shadow-sky-900/20' : 'border-slate-700/50 shadow-xl'}
+        rounded-2xl overflow-hidden
+        transition-colors duration-300 group
+      `}
     >
       {/* Glossy gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
