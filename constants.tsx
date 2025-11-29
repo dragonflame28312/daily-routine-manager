@@ -212,7 +212,7 @@ export const ROUTINE_ITEMS: RoutineItem[] = [
   {
     id: '22',
     name: 'Pumpkin Seed Oil',
-    tagline: 'Prostate & hair support',
+    tagline: 'Hair',
     times: ['midday'],
     categories: ['supplements'],
     mainTime: 'midday',
