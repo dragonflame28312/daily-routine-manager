@@ -38,6 +38,8 @@ export const OVERVIEW_DATA: OverviewData = {
     { item: 'Cleanser', amount: 'N/A', frequency: 'AM & PM' },
     { item: 'Hyaluronic Acid', amount: '3–4 drops', frequency: 'AM & PM' },
     { item: 'Niacinamide', amount: '2-3 drops', frequency: 'AM' },
+    // Vitamin C serum is used primarily in the morning to brighten skin and protect against oxidative stress. It can also be used on non‑retinol nights.
+    { item: 'Vitamin C Serum', amount: '2–3 drops', frequency: 'AM (optional PM on non‑retinol nights)' },
     { item: 'Moisturiser', amount: 'Pea-sized amount', frequency: 'AM & PM' },
     { item: 'Retinol', amount: 'Thin layer', frequency: '2x Week (PM)' },
     { item: 'Vaseline', amount: 'Very thin layer', frequency: 'PM (Under eyes)' },
@@ -45,7 +47,7 @@ export const OVERVIEW_DATA: OverviewData = {
     { item: 'Coconut Oil', amount: 'Light/Thin layer', frequency: 'Daily (Hair)' },
     { item: 'Moringa Oil', amount: 'Massage into scalp', frequency: 'Every other day (PM)' },
     { item: 'Rosemary Oil', amount: 'Apply to scalp', frequency: 'Every other day (PM)' },
-    { item: 'Castor Oil', amount: 'Hair', frequency: 'Every other day (PM)' },
+    { item: 'Castor Oil', amount: 'Hairline/Scalp', frequency: 'Every other day (PM)' },
   ]
 };
 
@@ -212,7 +214,7 @@ export const ROUTINE_ITEMS: RoutineItem[] = [
   {
     id: '22',
     name: 'Pumpkin Seed Oil',
-    tagline: 'Hair',
+    tagline: 'Prostate & hair support',
     times: ['midday'],
     categories: ['supplements'],
     mainTime: 'midday',
@@ -490,7 +492,7 @@ export const ROUTINE_ITEMS: RoutineItem[] = [
     },
     details: [
         'Apply every other day (e.g., Mon, Wed, Fri, Sun).',
-        'Focus on the scalp.',
+        'Focus on the hairline or scalp.',
         'Thicker oil, so use sparingly.',
         'Leave in overnight and wash out the next morning.'
     ],
