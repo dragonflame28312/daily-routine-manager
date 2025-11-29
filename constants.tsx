@@ -45,7 +45,7 @@ export const OVERVIEW_DATA: OverviewData = {
     { item: 'Coconut Oil', amount: 'Light/Thin layer', frequency: 'Daily (Hair)' },
     { item: 'Moringa Oil', amount: 'Massage into scalp', frequency: 'Every other day (PM)' },
     { item: 'Rosemary Oil', amount: 'Apply to scalp', frequency: 'Every other day (PM)' },
-    { item: 'Castor Oil', amount: 'Hairline/Scalp', frequency: 'Every other day (PM)' },
+    { item: 'Castor Oil', amount: 'Hair', frequency: 'Every other day (PM)' },
   ]
 };
 
@@ -490,7 +490,7 @@ export const ROUTINE_ITEMS: RoutineItem[] = [
     },
     details: [
         'Apply every other day (e.g., Mon, Wed, Fri, Sun).',
-        'Focus on the hairline or scalp.',
+        'Focus on the scalp.',
         'Thicker oil, so use sparingly.',
         'Leave in overnight and wash out the next morning.'
     ],
