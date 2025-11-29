@@ -210,6 +210,27 @@ export const ROUTINE_ITEMS: RoutineItem[] = [
     details: ['Take 1 tablet with lunch after your ACV water.'],
   },
   {
+    id: '22',
+    name: 'Pumpkin Seed Oil',
+    tagline: 'Prostate & hair support',
+    times: ['midday'],
+    categories: ['supplements'],
+    mainTime: 'midday',
+    order: 9.5,
+    badges: [
+      { label: 'Lunch', type: 'time' },
+      { label: 'Supplement', type: 'cat' },
+    ],
+    link: {
+      url: 'https://www.amazon.com/s?k=Pumpkin+Seed+Oil+capsules',
+      label: 'Link',
+    },
+    details: [
+      'Take 1 capsule with lunch after your other midday supplements.',
+      'Drink a glass of water to help swallow the capsule.',
+    ],
+  },
+  {
     id: '10',
     name: 'Cetaphil Gentle Cleanser',
     tagline: 'Start of face routine',
@@ -274,13 +295,36 @@ export const ROUTINE_ITEMS: RoutineItem[] = [
     ],
   },
   {
+    id: '14',
+    name: 'Retinol Nights',
+    tagline: 'Anti-aging / firming',
+    times: ['evening'],
+    categories: ['face'],
+    mainTime: 'evening',
+    order: 13,
+    badges: [
+      { label: '2x per week', type: 'time' },
+      { label: 'Active', type: 'cat' },
+    ],
+    link: {
+      url: 'https://www.amazon.co.uk/Ordinary-Retinol-Squalane-Anti-Aging-Smoothing/dp/B0F9Y2G6ZY',
+      label: 'Link',
+    },
+    details: [
+      'Example nights: Monday & Friday.',
+      'Order: Cleanser → Hyaluronic Acid → (optional thin layer of moisturizer for sensitive skin) → thin layer of retinol → CeraVe → Vaseline under eyes.',
+      'Retinol is normally applied after serums and before moisturizer; for very dry or sensitive skin, you can apply a light layer of CeraVe before and after retinol (the “sandwich” method).',
+      'Skip vitamin C on retinol nights and reserve vitamin C for the morning or non‑retinol nights.',
+    ],
+  },
+  {
     id: '13',
     name: 'CeraVe Moisturising Cream',
     tagline: 'Seal everything in',
     times: ['morning', 'evening'],
     categories: ['face'],
     mainTime: 'evening',
-    order: 13,
+    order: 14,
     badges: [
       { label: 'AM & PM', type: 'time' },
       { label: 'Moisturiser', type: 'cat' },
@@ -292,28 +336,6 @@ export const ROUTINE_ITEMS: RoutineItem[] = [
     details: [
       'Use a pea-sized amount for face and neck after serums.',
       'Tap a little under the eyes before Vaseline at night.',
-    ],
-  },
-  {
-    id: '14',
-    name: 'Retinol Nights',
-    tagline: 'Anti-aging / firming',
-    times: ['evening'],
-    categories: ['face'],
-    mainTime: 'evening',
-    order: 14,
-    badges: [
-      { label: '2x per week', type: 'time' },
-      { label: 'Active', type: 'cat' },
-    ],
-    link: {
-      url: 'https://www.amazon.co.uk/Ordinary-Retinol-Squalane-Anti-Aging-Smoothing/dp/B0F9Y2G6ZY',
-      label: 'Link',
-    },
-    details: [
-      'Example nights: Monday & Friday.',
-      'Order: Cleanser → HA → thin layer of retinol → CeraVe → Vaseline under eyes.',
-      'Skip Vitamin C on retinol nights.',
     ],
   },
   {

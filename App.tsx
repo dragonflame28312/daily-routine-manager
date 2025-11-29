@@ -16,11 +16,24 @@ const App: React.FC = () => {
 
   // Filter Logic
   const filteredItems = useMemo(() => {
-    return ROUTINE_ITEMS.filter((item) => {
-      const matchesTime = timeFilter === 'all' || item.times.includes(timeFilter) || (timeFilter === 'allDay' && item.times.includes('allDay'));
-      const matchesCategory = categoryFilter === 'all' || item.categories.includes(categoryFilter);
-      return matchesTime && matchesCategory;
-    });
+    return ROUTINE_ITEMS
+      .filter((item) => {
+        const matchesTime =
+          timeFilter === 'all' ||
+          item.times.includes(timeFilter) ||
+          (timeFilter === 'allDay' && item.times.includes('allDay'));
+        const matchesCategory = categoryFilter === 'all' || item.categories.includes(categoryFilter);
+        return matchesTime && matchesCategory;
+      })
+      .sort((a, b) => {
+        // Sort by numerical order property if present; fallback to string comparison of id for stability
+        const orderA = typeof a.order === 'number' ? a.order : Number(a.order);
+        const orderB = typeof b.order === 'number' ? b.order : Number(b.order);
+        if (!isNaN(orderA) && !isNaN(orderB)) {
+          return orderA - orderB;
+        }
+        return a.id.localeCompare(b.id);
+      });
   }, [timeFilter, categoryFilter]);
 
   // Set initial active item
@@ -279,7 +292,7 @@ const App: React.FC = () => {
                 <div className="grid md:grid-cols-2 gap-8">
                   {/* Table 2: Daily Totals */}
                   <section>
-                    <h3 className="text-lg font-bold text-sky-400 mb-4 flex items_center gap-2">
+                    <h3 className="text-lg font-bold text-sky-400 mb-4 flex items-center gap-2">
                       <PillIcon /> Total Daily Amounts
                     </h3>
                     <div className="overflow-x-auto rounded-lg border border-slate-700">
