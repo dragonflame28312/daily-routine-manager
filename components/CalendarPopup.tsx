@@ -145,9 +145,20 @@ const CalendarPopup: React.FC<CalendarPopupProps> = ({ onClose }) => {
               const isToday = date.toDateString() === today.toDateString();
               // Compute tasks for this date to determine which time-of-day dots to show
               const tasksForDate = computeTasksForDate(date);
-              const hasMorning = tasksForDate.morning.length > 0;
-              const hasMidday = tasksForDate.midday.length > 0;
-              const hasEvening = tasksForDate.evening.length > 0;
+              // Always show dots for morning, midday and evening to indicate those parts of the day
+              // are part of your routine every day. Even if there happen to be no tasks for a given
+              // time period (which rarely occurs), we still display a dot so the calendar is
+              // consistent and easy to scan. Previously we relied on the number of tasks in each
+              // bucket which could result in missing dots on some days.
+              const hasMorning = true;
+              const hasMidday = true;
+              const hasEvening = true;
+
+              // Determine if the tooltip should appear above or below the cell. On the last two rows
+              // of the calendar there isn’t enough space below the cell for a tooltip, so we flip
+              // it above. We pass this boolean down to the tooltip component via the showAbove prop.
+              const rowIndex = Math.floor(idx / 7);
+              const showAbove = rowIndex >= 4;
               return (
                 <div
                   key={idx}
@@ -166,7 +177,9 @@ const CalendarPopup: React.FC<CalendarPopupProps> = ({ onClose }) => {
                     {hasMidday && <span className="w-1.5 h-1.5 rounded-full bg-teal-500" title="Midday tasks" />}
                     {hasEvening && <span className="w-1.5 h-1.5 rounded-full bg-purple-500" title="Evening tasks" />}
                   </div>
-                  {hoverDate && hoverDate.getTime() === date.getTime() && <TaskTooltip date={date} />}
+                  {hoverDate && hoverDate.getTime() === date.getTime() && (
+                    <TaskTooltip date={date} showAbove={showAbove} />
+                  )}
                 </div>
               );
             })}
@@ -177,11 +190,16 @@ const CalendarPopup: React.FC<CalendarPopupProps> = ({ onClose }) => {
   );
 };
 
-// Tooltip component for showing tasks when hovering over a date
-const TaskTooltip: React.FC<{ date: Date }> = ({ date }) => {
+// Tooltip component for showing tasks when hovering over a date. The showAbove flag flips
+// the tooltip above the cell instead of below when space is limited (e.g. bottom rows).
+const TaskTooltip: React.FC<{ date: Date; showAbove?: boolean }> = ({ date, showAbove = false }) => {
   const tasks = useMemo(() => computeTasksForDate(date), [date]);
+  // Decide positioning classes based on whether we want the tooltip to appear above or below
+  const positionClass = showAbove ? 'bottom-full mb-2' : 'top-full mt-2';
   return (
-    <div className="absolute z-50 top-full left-1/2 transform -translate-x-1/2 mt-2 w-64 bg-gray-900 border border-gray-700 rounded-lg shadow-xl p-3 text-left">
+    <div
+      className={`absolute z-50 left-1/2 transform -translate-x-1/2 ${positionClass} w-80 max-h-64 overflow-y-auto bg-gray-900 border border-gray-700 rounded-lg shadow-xl p-3 text-left`}
+    >
       <h4 className="text-sm font-semibold text-fuchsia-400 mb-1">
         {date.toLocaleDateString('default', { weekday: 'long', month: 'short', day: 'numeric' })}
       </h4>
@@ -191,9 +209,7 @@ const TaskTooltip: React.FC<{ date: Date }> = ({ date }) => {
             <p className="text-xs uppercase font-bold mb-1 text-teal-400">{time}</p>
             <ul className="space-y-0.5 list-disc list-inside text-gray-300">
               {items.map(i => (
-                <li key={i.id} className="">
-                  {i.name}
-                </li>
+                <li key={i.id}>{i.name}</li>
               ))}
             </ul>
           </div>
