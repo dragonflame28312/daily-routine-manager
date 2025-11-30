@@ -12,11 +12,18 @@ export const RoutineCard: React.FC<RoutineCardProps> = ({ item, isActive }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   // Helper to determine border/accent color based on item type or time
+  // Use fuchsia and teal accents for a cohesive dark theme
   const getAccentColor = (type: string) => {
     switch (type) {
-      case 'time': return 'border-sky-500/50 text-sky-300 bg-sky-950/30';
-      case 'special': return 'border-emerald-500/50 text-emerald-300 bg-emerald-950/30';
-      default: return 'border-slate-600/50 text-slate-400 bg-slate-800/50';
+      case 'time':
+        // "time" badges use a fuchsia hue
+        return 'border-fuchsia-500/50 text-fuchsia-300 bg-fuchsia-950/30';
+      case 'special':
+        // "special" badges use a teal hue
+        return 'border-teal-500/50 text-teal-300 bg-teal-950/30';
+      default:
+        // Default badges use neutral greys
+        return 'border-gray-600/50 text-gray-400 bg-gray-800/50';
     }
   };
 
@@ -42,10 +49,10 @@ export const RoutineCard: React.FC<RoutineCardProps> = ({ item, isActive }) => {
       }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
       className={`
-        /* Increase default card width for better mobile readability */
-        relative w-[320px] md:w-[380px] flex-shrink-0 
-        bg-slate-900/60 backdrop-blur-xl border 
-        ${isActive ? 'border-sky-500/50 shadow-2xl shadow-sky-900/20' : 'border-slate-700/50 shadow-xl'}
+        /* Increased card widths for ultra‑wide screens */
+        relative w-[360px] md:w-[420px] lg:w-[480px] xl:w-[540px] flex-shrink-0
+        bg-gray-900/60 backdrop-blur-xl border
+        ${isActive ? 'border-fuchsia-500/50 shadow-2xl shadow-fuchsia-900/20' : 'border-gray-700/50 shadow-xl'}
         rounded-2xl overflow-hidden
         transition-colors duration-300 group
       `}
@@ -92,7 +99,7 @@ export const RoutineCard: React.FC<RoutineCardProps> = ({ item, isActive }) => {
               href={item.link.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-xs text-sky-400 hover:text-sky-300 transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs text-teal-400 hover:text-teal-300 transition-colors"
             >
               <ExternalLink size={12} />
               {item.link.label}
@@ -102,7 +109,7 @@ export const RoutineCard: React.FC<RoutineCardProps> = ({ item, isActive }) => {
           {/* Toggle Details Button */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="w-full flex items-center justify-between text-xs font-semibold text-slate-300 bg-slate-800/50 hover:bg-slate-700/50 px-3 py-2 rounded-lg transition-colors border border-slate-700"
+            className="w-full flex items-center justify-between text-xs font-semibold text-gray-300 bg-gray-800/50 hover:bg-gray-700/50 px-3 py-2 rounded-lg transition-colors border border-gray-700"
           >
             <span>{isOpen ? 'Hide Details' : 'Details / How to use'}</span>
             {isOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
@@ -118,10 +125,10 @@ export const RoutineCard: React.FC<RoutineCardProps> = ({ item, isActive }) => {
               exit={{ height: 0, opacity: 0 }}
               className="overflow-hidden"
             >
-              <div className="pt-3 pb-1 text-sm text-slate-300 space-y-1 border-t border-slate-700/50 mt-3 border-dashed">
+              <div className="pt-3 pb-1 text-sm text-gray-300 space-y-1 border-t border-gray-700/50 mt-3 border-dashed">
                 {item.details.map((line, idx) => (
                   <p key={idx} className="flex gap-2 leading-relaxed">
-                    <span className="text-sky-500/50 mt-1.5">•</span>
+                    <span className="text-fuchsia-500/50 mt-1.5">•</span>
                     <span>{line}</span>
                   </p>
                 ))}
