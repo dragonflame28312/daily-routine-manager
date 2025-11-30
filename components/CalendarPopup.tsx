@@ -20,9 +20,10 @@ const getHairOilForDay = (dow: number): string => {
   return cycle[index];
 };
 
-// Determine if this day of the week is a retinol night. We schedule retinol on Monday, Wednesday and Friday by default.
+// Determine if this day of the week is a retinol night. We schedule retinol on two spaced days each week (Monday and Thursday).
+// Monday = 1, Thursday = 4 (0 = Sunday).
 const isRetinolNight = (dow: number): boolean => {
-  const retinolDays = [1, 3, 5]; // Monday, Wednesday, Friday
+  const retinolDays = [1, 4];
   return retinolDays.includes(dow);
 };
 
@@ -72,19 +73,30 @@ const CalendarPopup: React.FC<CalendarPopupProps> = ({ onClose }) => {
   const [currentMonth, setCurrentMonth] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
   const [hoverDate, setHoverDate] = useState<Date | null>(null);
 
-  // Generate calendar days for the current month, including leading blanks
+  // Generate calendar days for the current month, including days from previous and next months
+  // to fill a consistent 6-week grid. Each entry also indicates whether it belongs to the current month.
   const days = useMemo(() => {
     const year = currentMonth.getFullYear();
     const month = currentMonth.getMonth();
     const firstOfMonth = new Date(year, month, 1);
     const startDay = firstOfMonth.getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const result: (Date | null)[] = [];
-    for (let i = 0; i < startDay; i++) {
-      result.push(null);
+    const daysInPrevMonth = new Date(year, month, 0).getDate();
+    const result: { date: Date; isCurrentMonth: boolean }[] = [];
+    // Prepend days from previous month
+    for (let i = startDay - 1; i >= 0; i--) {
+      const date = new Date(year, month - 1, daysInPrevMonth - i);
+      result.push({ date, isCurrentMonth: false });
     }
+    // Current month days
     for (let d = 1; d <= daysInMonth; d++) {
-      result.push(new Date(year, month, d));
+      result.push({ date: new Date(year, month, d), isCurrentMonth: true });
+    }
+    // Append days from next month until we have a full 6-week (42 cell) grid
+    while (result.length % 7 !== 0 || result.length < 42) {
+      const lastDate = result[result.length - 1].date;
+      const nextDate = new Date(lastDate.getFullYear(), lastDate.getMonth(), lastDate.getDate() + 1);
+      result.push({ date: nextDate, isCurrentMonth: false });
     }
     return result;
   }, [currentMonth]);
@@ -102,7 +114,7 @@ const CalendarPopup: React.FC<CalendarPopupProps> = ({ onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-      <div className="w-full max-w-3xl bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl overflow-hidden">
+      <div className="w-full max-w-3xl bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl overflow-visible">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-700 bg-gray-800/50">
           <h2 className="text-lg font-bold text-gray-200">Monthly Schedule Planner</h2>
@@ -128,30 +140,33 @@ const CalendarPopup: React.FC<CalendarPopupProps> = ({ onClose }) => {
             ))}
           </div>
           <div className="grid grid-cols-7 gap-1 text-sm">
-            {days.map((date, idx) => {
-              if (!date) {
-                return <div key={idx} className="h-12" />;
-              }
-              const day = date.getDate();
+            {days.map(({ date, isCurrentMonth }, idx) => {
+              const dayNum = date.getDate();
               const isToday = date.toDateString() === today.toDateString();
-              const isRetinol = isRetinolNight(date.getDay());
-              const hairOil = getHairOilForDay(date.getDay());
+              // Compute tasks for this date to determine which time-of-day dots to show
+              const tasksForDate = computeTasksForDate(date);
+              const hasMorning = tasksForDate.morning.length > 0;
+              const hasMidday = tasksForDate.midday.length > 0;
+              const hasEvening = tasksForDate.evening.length > 0;
               return (
                 <div
                   key={idx}
-                  className={`relative h-12 flex items-center justify-center rounded-lg cursor-default transition-colors ${isToday ? 'bg-fuchsia-600/30 border border-fuchsia-500' : 'bg-gray-800/50 border border-gray-700 hover:bg-gray-700/50'}`}
+                  className={`relative h-12 flex items-center justify-center rounded-lg cursor-default transition-colors ${
+                    isToday
+                      ? 'bg-fuchsia-600/30 border border-fuchsia-500'
+                      : 'bg-gray-800/50 border border-gray-700 hover:bg-gray-700/50'
+                  } ${!isCurrentMonth ? 'opacity-40' : ''}`}
                   onMouseEnter={() => setHoverDate(date)}
                   onMouseLeave={() => setHoverDate(prev => (prev && prev.getTime() === date.getTime() ? null : prev))}
                 >
-                  <span className="z-10 font-medium text-gray-200">{day}</span>
-                  {/* Indicator dots for retinol and hair oil */}
+                  <span className="z-10 font-medium text-gray-200">{dayNum}</span>
+                  {/* Indicator dots for each time of day */}
                   <div className="absolute bottom-1 left-1 flex gap-0.5">
-                    {isRetinol && <span className="w-1.5 h-1.5 rounded-full bg-fuchsia-500" title="Retinol" />}
-                    <span className="w-1.5 h-1.5 rounded-full bg-teal-500" title={hairOil} />
+                    {hasMorning && <span className="w-1.5 h-1.5 rounded-full bg-fuchsia-500" title="Morning tasks" />}
+                    {hasMidday && <span className="w-1.5 h-1.5 rounded-full bg-teal-500" title="Midday tasks" />}
+                    {hasEvening && <span className="w-1.5 h-1.5 rounded-full bg-purple-500" title="Evening tasks" />}
                   </div>
-                  {hoverDate && hoverDate.getTime() === date.getTime() && (
-                    <TaskTooltip date={date} />
-                  )}
+                  {hoverDate && hoverDate.getTime() === date.getTime() && <TaskTooltip date={date} />}
                 </div>
               );
             })}
