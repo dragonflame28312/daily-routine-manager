@@ -10,15 +10,22 @@ interface CalendarPopupProps {
 // Days of the week labels starting on Sunday
 const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-// Determine which hair oil to use on a given day of week.
-// We cycle through Moringa, Rosemary, and Castor in order starting on Monday.
-const getHairOilForDay = (dow: number): string => {
-  // Define cycle: index 0 -> Moringa, 1 -> Rosemary, 2 -> Castor
-  const cycle = ['Moringa Oil', 'Rosemary Oil', 'Castor Oil'];
-  // For Monday (1) index 0, Tuesday (2) index 1, Wednesday (3) index 2, Thursday (4) index 0, etc.
-  const index = dow === 0 ? 0 : ((dow - 1) % cycle.length);
-  return cycle[index];
-};
+// Hair oils (moringa, rosemary and castor) are used every other day on a shared schedule.
+// We designate specific days of the week as “hair oil days” (Sun, Mon, Wed, Fri). On those days,
+// all three oils are applied together during the evening. On other days, they are omitted.
+
+// Names of the hair oils defined in constants.tsx
+const hairOils = ['Moringa Oil', 'Rosemary Oil', 'Castor Oil'];
+
+// Days of week (0=Sunday, 1=Monday, 3=Wednesday, 5=Friday) when hair oils should be used.
+const HAIR_OIL_DAYS = [0, 1, 3, 5];
+
+/*
+ * Note: Previously we rotated a single hair oil across days of the year, but the user
+ * requested that all hair oils be used every other day. The HAIR_OIL_DAYS array ensures that
+ * on these designated days the entire hair oil trio appears in the evening. Coconut oil
+ * remains a daily AM/PM task and is handled via its times in constants.tsx.
+ */
 
 // Determine if this day of the week is a retinol night. We schedule retinol on two spaced days each week (Monday and Thursday).
 // Monday = 1, Thursday = 4 (0 = Sunday).
@@ -42,15 +49,18 @@ const computeTasksForDate = (date: Date) => {
     if (item.name === 'Retinol Nights' && !isRetinolNight(dow)) {
       return;
     }
-    // Include only the appropriate hair oil for this day
-    if (['Moringa Oil', 'Rosemary Oil', 'Castor Oil'].includes(item.name)) {
-      const expected = getHairOilForDay(dow);
-      if (item.name !== expected) {
+    // Hair oils: include all hair oils on designated hair‑oil days (Sun, Mon, Wed, Fri). Skip them on other days.
+    let timesList = item.times;
+    if (hairOils.includes(item.name)) {
+      // If today is not a hair‑oil day, skip this hair oil.
+      if (!HAIR_OIL_DAYS.includes(dow)) {
         return;
       }
+      // Force hair oils into the evening slot (since they are applied at night)
+      timesList = ['evening'];
     }
     // Add item to each of its designated times
-    item.times.forEach(time => {
+    timesList.forEach(time => {
       if (tasks[time]) {
         tasks[time].push(item);
       }
@@ -71,7 +81,8 @@ const computeTasksForDate = (date: Date) => {
 const CalendarPopup: React.FC<CalendarPopupProps> = ({ onClose }) => {
   const today = new Date();
   const [currentMonth, setCurrentMonth] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
-  const [hoverDate, setHoverDate] = useState<Date | null>(null);
+  // Tracks the currently selected date for which to show the tooltip. Clicking a day toggles this state.
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   // Generate calendar days for the current month, including days from previous and next months
   // to fill a consistent 6-week grid. Each entry also indicates whether it belongs to the current month.
@@ -113,8 +124,15 @@ const CalendarPopup: React.FC<CalendarPopupProps> = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-      <div className="w-full max-w-3xl bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl overflow-visible">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+      onClick={() => setSelectedDate(null)}
+    >
+      {/* Remove max-w constraint so calendar uses the full viewport width on ultrawide screens */}
+      <div
+        className="w-full bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl overflow-visible"
+        onClick={e => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-700 bg-gray-800/50">
           <h2 className="text-lg font-bold text-gray-200">Monthly Schedule Planner</h2>
@@ -143,41 +161,33 @@ const CalendarPopup: React.FC<CalendarPopupProps> = ({ onClose }) => {
             {days.map(({ date, isCurrentMonth }, idx) => {
               const dayNum = date.getDate();
               const isToday = date.toDateString() === today.toDateString();
-              // Compute tasks for this date to determine which time-of-day dots to show
-              const tasksForDate = computeTasksForDate(date);
-              // Always show dots for morning, midday and evening to indicate those parts of the day
-              // are part of your routine every day. Even if there happen to be no tasks for a given
-              // time period (which rarely occurs), we still display a dot so the calendar is
-              // consistent and easy to scan. Previously we relied on the number of tasks in each
-              // bucket which could result in missing dots on some days.
-              const hasMorning = true;
-              const hasMidday = true;
-              const hasEvening = true;
-
-              // Determine if the tooltip should appear above or below the cell. On the last two rows
-              // of the calendar there isn’t enough space below the cell for a tooltip, so we flip
-              // it above. We pass this boolean down to the tooltip component via the showAbove prop.
+              // Determine tooltip position (above for bottom two rows)
               const rowIndex = Math.floor(idx / 7);
               const showAbove = rowIndex >= 4;
               return (
                 <div
                   key={idx}
-                  className={`relative h-12 flex items-center justify-center rounded-lg cursor-default transition-colors ${
+                  className={`relative h-12 flex items-center justify-center rounded-lg cursor-pointer transition-colors ${
                     isToday
                       ? 'bg-fuchsia-600/30 border border-fuchsia-500'
                       : 'bg-gray-800/50 border border-gray-700 hover:bg-gray-700/50'
                   } ${!isCurrentMonth ? 'opacity-40' : ''}`}
-                  onMouseEnter={() => setHoverDate(date)}
-                  onMouseLeave={() => setHoverDate(prev => (prev && prev.getTime() === date.getTime() ? null : prev))}
+                  onClick={() => {
+                    if (selectedDate && selectedDate.getTime() === date.getTime()) {
+                      setSelectedDate(null);
+                    } else {
+                      setSelectedDate(date);
+                    }
+                  }}
                 >
                   <span className="z-10 font-medium text-gray-200">{dayNum}</span>
-                  {/* Indicator dots for each time of day */}
+                  {/* Indicator dots for each time of day (morning, midday, evening) using new colors */}
                   <div className="absolute bottom-1 left-1 flex gap-0.5">
-                    {hasMorning && <span className="w-1.5 h-1.5 rounded-full bg-fuchsia-500" title="Morning tasks" />}
-                    {hasMidday && <span className="w-1.5 h-1.5 rounded-full bg-teal-500" title="Midday tasks" />}
-                    {hasEvening && <span className="w-1.5 h-1.5 rounded-full bg-purple-500" title="Evening tasks" />}
+                    <span className="w-1.5 h-1.5 rounded-full bg-yellow-400" title="Morning" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-sky-400" title="Afternoon" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-purple-500" title="Evening" />
                   </div>
-                  {hoverDate && hoverDate.getTime() === date.getTime() && (
+                  {selectedDate && selectedDate.getTime() === date.getTime() && (
                     <TaskTooltip date={date} showAbove={showAbove} />
                   )}
                 </div>
