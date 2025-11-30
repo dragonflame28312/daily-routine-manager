@@ -21,6 +21,10 @@ export const OVERVIEW_DATA: OverviewData = {
     { time: 'Afternoon', item: 'Calc/Mag/Zinc', dose: '1 tablet', notes: 'Standard daily serving' },
     { time: 'Afternoon', item: 'Pumpkin Seed Oil', dose: '1 capsule', notes: '3000 mg capsule' },
     { time: 'Evening', item: 'Biotin', dose: '1 tablet', notes: 'Second daily tablet' },
+    // Apple Cider Vinegar should be listed under supplements (not topicals). It is taken before each main meal.
+    { time: 'Morning', item: 'ACV in water', dose: '1 tsp', notes: 'Drink before breakfast' },
+    { time: 'Afternoon', item: 'ACV in water', dose: '1 tsp', notes: 'Drink before lunch' },
+    { time: 'Evening', item: 'ACV in water', dose: '1 tsp', notes: 'Drink before dinner' },
   ],
   totals: [
     { item: 'Citicoline Blend', total: '2 capsules' },
@@ -34,7 +38,6 @@ export const OVERVIEW_DATA: OverviewData = {
     { item: 'Pumpkin Seed Oil', total: '1 capsule' },
   ],
   topicals: [
-    { item: 'ACV (in water)', amount: '1 teaspoon', frequency: '3x Daily (Before meals)' },
     { item: 'Cleanser', amount: 'N/A', frequency: 'AM & PM' },
     { item: 'Hyaluronic Acid', amount: '3–4 drops', frequency: 'AM & PM' },
     { item: 'Niacinamide', amount: '2-3 drops', frequency: 'AM' },
@@ -411,13 +414,14 @@ export const ROUTINE_ITEMS: RoutineItem[] = [
   {
     id: '18',
     name: 'Daily Coconut Oil',
-    tagline: 'Every day',
-    times: ['allDay'],
+    tagline: 'Morning & Evening',
+    // Coconut oil is applied twice per day: in the morning and evening.
+    times: ['morning', 'evening'],
     categories: ['hair'],
     mainTime: 'allDay',
     order: 18,
     badges: [
-      { label: 'Daily', type: 'time' },
+      { label: 'AM & PM', type: 'time' },
       { label: 'Scalp', type: 'cat' },
     ],
     link: {
@@ -425,8 +429,8 @@ export const ROUTINE_ITEMS: RoutineItem[] = [
       label: 'Link',
     },
     details: [
-      'Use a light amount on scalp and hair every day.',
-      'Good time: after morning face routine or later in the day while you work.',
+      'Apply a light amount on scalp and hair every day.',
+      'Best used twice daily: after your morning face routine and again in the evening.',
       'Aim for a thin layer rather than fully soaked hair.',
     ],
   },
