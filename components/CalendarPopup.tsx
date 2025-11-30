@@ -128,9 +128,12 @@ const CalendarPopup: React.FC<CalendarPopupProps> = ({ onClose }) => {
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
       onClick={() => setSelectedDate(null)}
     >
-      {/* Remove max-w constraint so calendar uses the full viewport width on ultrawide screens */}
+      {/* Use a maximum width on the calendar container so it doesn't become
+         excessively wide on smaller screens. On very large screens the container
+         can still stretch out to a reasonable limit, while on mobile it
+         remains full width. */}
       <div
-        className="w-full bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl overflow-visible"
+        className="w-full max-w-6xl mx-auto bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl overflow-visible"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
@@ -159,11 +162,24 @@ const CalendarPopup: React.FC<CalendarPopupProps> = ({ onClose }) => {
           </div>
           <div className="grid grid-cols-7 gap-1 text-sm">
             {days.map(({ date, isCurrentMonth }, idx) => {
+              // Determine column index for horizontal positioning (0=Sun .. 6=Sat)
+              const colIndex = idx % 7;
               const dayNum = date.getDate();
               const isToday = date.toDateString() === today.toDateString();
               // Determine tooltip position (above for bottom two rows)
               const rowIndex = Math.floor(idx / 7);
               const showAbove = rowIndex >= 4;
+              // Decide horizontal alignment for tooltip: align left on first two columns,
+              // right on last two columns, center otherwise. This prevents tooltips from
+              // overflowing off-screen on mobile when the cell is near the edge.
+              let horizontalPosition: 'left' | 'center' | 'right';
+              if (colIndex <= 1) {
+                horizontalPosition = 'left';
+              } else if (colIndex >= 5) {
+                horizontalPosition = 'right';
+              } else {
+                horizontalPosition = 'center';
+              }
               return (
                 <div
                   key={idx}
@@ -188,7 +204,11 @@ const CalendarPopup: React.FC<CalendarPopupProps> = ({ onClose }) => {
                     <span className="w-1.5 h-1.5 rounded-full bg-purple-500" title="Evening" />
                   </div>
                   {selectedDate && selectedDate.getTime() === date.getTime() && (
-                    <TaskTooltip date={date} showAbove={showAbove} />
+                    <TaskTooltip
+                      date={date}
+                      showAbove={showAbove}
+                      horizontalPosition={horizontalPosition}
+                    />
                   )}
                 </div>
               );
@@ -202,13 +222,34 @@ const CalendarPopup: React.FC<CalendarPopupProps> = ({ onClose }) => {
 
 // Tooltip component for showing tasks when hovering over a date. The showAbove flag flips
 // the tooltip above the cell instead of below when space is limited (e.g. bottom rows).
-const TaskTooltip: React.FC<{ date: Date; showAbove?: boolean }> = ({ date, showAbove = false }) => {
+interface TaskTooltipProps {
+  date: Date;
+  showAbove?: boolean;
+  /**
+   * Controls horizontal alignment of the tooltip relative to the selected day cell.
+   * 'left' anchors the tooltip to the left edge, 'right' to the right edge,
+   * and 'center' centers it horizontally. This helps keep tooltips visible on
+   * narrow mobile screens when selecting the first or last columns.
+   */
+  horizontalPosition?: 'left' | 'center' | 'right';
+}
+
+const TaskTooltip: React.FC<TaskTooltipProps> = ({ date, showAbove = false, horizontalPosition = 'center' }) => {
   const tasks = useMemo(() => computeTasksForDate(date), [date]);
-  // Decide positioning classes based on whether we want the tooltip to appear above or below
+  // Decide vertical positioning classes based on whether we want the tooltip to appear above or below
   const positionClass = showAbove ? 'bottom-full mb-2' : 'top-full mt-2';
+  // Determine horizontal alignment classes
+  let horizontalClass = '';
+  if (horizontalPosition === 'left') {
+    horizontalClass = 'left-0 ml-1 origin-left';
+  } else if (horizontalPosition === 'right') {
+    horizontalClass = 'right-0 mr-1 origin-right';
+  } else {
+    horizontalClass = 'left-1/2 transform -translate-x-1/2';
+  }
   return (
     <div
-      className={`absolute z-50 left-1/2 transform -translate-x-1/2 ${positionClass} w-80 max-h-64 overflow-y-auto bg-gray-900 border border-gray-700 rounded-lg shadow-xl p-3 text-left`}
+      className={`absolute z-50 ${horizontalClass} ${positionClass} w-72 md:w-80 max-h-64 overflow-y-auto bg-gray-900 border border-gray-700 rounded-lg shadow-xl p-3 text-left`}
     >
       <h4 className="text-sm font-semibold text-fuchsia-400 mb-1">
         {date.toLocaleDateString('default', { weekday: 'long', month: 'short', day: 'numeric' })}
